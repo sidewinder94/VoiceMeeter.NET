@@ -24,5 +24,7 @@ jobs:
       run: dotnet build --no-restore -c Release
     - name: Add Github nuget Repository
       run: nuget sources Add -Name Github -Source https://nuget.pkg.github.com/sidewinder94/index.json -username sidewinder94 -Password ${{ secrets.GITHUB_TOKEN }} -StorePasswordInClearText
-    - name: Push package
+    - name: Push package (GitHub)
       run: nuget push VoiceMeeter.NET\bin\Release\VoiceMeeter.NET.*.nupkg -Source GitHub
+    - name: Push package (NuGet Gallery)
+      run: nuget push VoiceMeeter.NET\bin\Release\VoiceMeeter.NET.*.nupkg ${{ secrets.NUGET_KEY }} -src https://api.nuget.org/v3/index.json
