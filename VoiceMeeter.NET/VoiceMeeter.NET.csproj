@@ -6,6 +6,14 @@
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Title>VoiceMeeter.NET</Title>
+        <Description>A wrapper providing both direct access to the VoiceMeeter Remote API and a high level abstraction layer</Description>
+        <PackageProjectUrl>https://github.com/sidewinder94/VoiceMeeterRemote.NET</PackageProjectUrl>
+        <PackageLicenseUrl>https://github.com/sidewinder94/VoiceMeeterRemote.NET/blob/main/LICENSE</PackageLicenseUrl>
+        <RepositoryUrl>https://github.com/sidewinder94/VoiceMeeterRemote.NET</RepositoryUrl>
+        <RepositoryType>Git</RepositoryType>
+        <PackageTags>VoiceMeeter</PackageTags>
+        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
