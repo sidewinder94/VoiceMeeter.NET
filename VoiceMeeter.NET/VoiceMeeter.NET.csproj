@@ -8,9 +8,9 @@
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Title>VoiceMeeter.NET</Title>
         <Description>A wrapper providing both direct access to the VoiceMeeter Remote API and a high level abstraction layer</Description>
-        <PackageProjectUrl>https://github.com/sidewinder94/VoiceMeeterRemote.NET</PackageProjectUrl>
+        <PackageProjectUrl>https://github.com/sidewinder94/VoiceMeeter.NET</PackageProjectUrl>
         <PackageLicenseFile>LICENSE</PackageLicenseFile>
-        <RepositoryUrl>https://github.com/sidewinder94/VoiceMeeterRemote.NET</RepositoryUrl>
+        <RepositoryUrl>https://github.com/sidewinder94/VoiceMeeter.NET</RepositoryUrl>
         <RepositoryType>Git</RepositoryType>
         <PackageTags>VoiceMeeter</PackageTags>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
