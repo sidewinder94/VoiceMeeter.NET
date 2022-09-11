@@ -274,7 +274,7 @@ public class VoiceMeeterClient : IVoiceMeeterClient, IDisposable
                 {
                     invocation.ReturnValue = false;
                     return;
-                };
+                }
                 
                 this.AssertLoggedIn(allowNotLaunched != null);
             }
