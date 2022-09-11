@@ -3,8 +3,6 @@ name: .NET
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
 jobs:
   build:
@@ -20,6 +18,8 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --no-restore
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet build --no-restore -c Release
+    - name: Add Github nuget Repository
+      run: nuget sources Add -Name Github -Source https://nuget.pkg.github.com/sidewinder94/index.json -username sidewinder94 -Password ${{ secrets.GITHUB_TOKEN }} -StorePasswordInClearText
+    - name: Push package
+      run: nuget push VoiceMeeter.NET\bin\Release\VoiceMeeter.NET.*.nupkg -Source GitHub
