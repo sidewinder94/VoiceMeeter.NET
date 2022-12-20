@@ -22,7 +22,7 @@ public class VoiceMeeterClient : IVoiceMeeterClient, IDisposable
     private readonly ILogger? _logger;
     private readonly object _lockObj = new();
 
-    private VoiceMeeterClient(ILogger logger)
+    private VoiceMeeterClient(ILogger? logger)
     {
         this._logger = logger;
     }
