@@ -5,7 +5,9 @@
 /// </summary>
 public enum VoiceMeeterType
 {
+    Unknown = 0,
     VoiceMeeter = 1,
     VoiceMeeterBanana = 2,
-    VoiceMeeterPotato = 3
+    VoiceMeeterPotato = 3,
+    VoiceMeeterPotato64 = 6
 }

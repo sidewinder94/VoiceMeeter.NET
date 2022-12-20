@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Castle.DynamicProxy;
 using JetBrains.Annotations;
+using Microsoft.Extensions.Logging;
 using VoiceMeeter.NET.Attributes;
 using VoiceMeeter.NET.Enums;
 using VoiceMeeter.NET.Exceptions;
@@ -11,26 +12,31 @@ using VoiceMeeter.NET.Structs;
 
 namespace VoiceMeeter.NET;
 
+[UsedImplicitly(ImplicitUseTargetFlags.WithInheritors)]
 public class VoiceMeeterClient : IVoiceMeeterClient, IDisposable
 {
-    [UsedImplicitly] 
-    public LoginResponse Status { get; private set; } = LoginResponse.LoggedOff;
+    [UsedImplicitly]
+    [AllowNotLaunched]
+    public virtual LoginResponse Status { get; internal set; } = LoginResponse.LoggedOff;
 
+    private readonly ILogger? _logger;
     private readonly object _lockObj = new();
 
-    private VoiceMeeterClient()
+    private VoiceMeeterClient(ILogger logger)
     {
+        this._logger = logger;
     }
 
     /// <summary>
     /// Creates a client able to interact with VoiceMeeter remote API
     /// </summary>
     /// <seealso cref="DependencyInjectionExtensions.AddVoiceMeeterClient"/>
+    /// <param name="loggerFactory">An optional <see cref="ILoggerFactory"/> to allow logging</param>
     /// <returns>An instance of <see cref="IVoiceMeeterClient"/></returns>
-    public static IVoiceMeeterClient Create()
+    public static IVoiceMeeterClient Create(ILoggerFactory? loggerFactory = null)
     {
         var proxyGenerator = new ProxyGenerator();
-        var client = new VoiceMeeterClient();
+        var client = new VoiceMeeterClient(loggerFactory?.CreateLogger<VoiceMeeterClient>());
         var interceptor = new ClientInterceptor(client);
         return proxyGenerator.CreateInterfaceProxyWithTargetInterface<IVoiceMeeterClient>(client, interceptor);
     }
@@ -69,14 +75,46 @@ public class VoiceMeeterClient : IVoiceMeeterClient, IDisposable
                 throw new ArgumentOutOfRangeException(nameof(voiceMeeterType));
         }
     }
+
+    /// <inheritdoc/>
+    [AllowNotLaunched]
+    public async Task RunAndWaitForVoiceMeeterAsync(VoiceMeeterType voiceMeeterType, CancellationToken cancellationToken)
+    {
+        while (this.GetVoiceMeeterType() == VoiceMeeterType.Unknown)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            this.RunVoiceMeeter(voiceMeeterType);
+            await Task.Delay(500, cancellationToken).ConfigureAwait(false);
+        }
+
+        this.Status = LoginResponse.Ok;
+    }
     
     /// <inheritdoc/>
-    public  VoiceMeeterConfiguration GetConfiguration(TimeSpan? refreshDelay = null)
+    public async Task<VoiceMeeterConfiguration> GetConfigurationAsync(TimeSpan? refreshDelay = null, CancellationToken cancellationToken = default)
     {
-        return new VoiceMeeterConfiguration(this, refreshDelay, this.GetVoiceMeeterType()).Init();
+        while (true)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            
+            try
+            {
+                return new VoiceMeeterConfiguration(this, refreshDelay, this.GetVoiceMeeterType()).Init();
+            }
+            catch
+            {
+                if (this._logger != null && this._logger.IsEnabled(LogLevel.Warning))
+                {
+                    this._logger.LogWarning("Error while trying to create configuration, retrying...");
+                }
+
+                await Task.Delay(150, cancellationToken);
+            }
+        }
     }
 
     /// <inheritdoc/>
+    [AllowNotLaunched]
     public VoiceMeeterType GetVoiceMeeterType()
     {
         NativeMethods.GetVoiceMeeterType(out long result);
@@ -253,7 +291,7 @@ public class VoiceMeeterClient : IVoiceMeeterClient, IDisposable
         private void AssertLoggedIn(bool allowNotLaunched = false)
         {
             // Allows execution to continue if Status is ok
-            if (this.Client.Status == LoginResponse.Ok ||
+            if (this.Client.Status is LoginResponse.Ok or LoginResponse.AlreadyLoggedIn ||
                 // Or if OkButNotLaunched allowed, allow that status too
                 (allowNotLaunched && this.Client.Status == LoginResponse.VoiceMeeterNotRunning)) return;
 

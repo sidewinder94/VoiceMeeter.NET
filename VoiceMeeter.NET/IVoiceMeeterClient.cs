@@ -32,7 +32,7 @@ public interface IVoiceMeeterClient
     bool Logout();
     
     /// <summary>
-    /// Request to start VoiceMeeter
+    /// Request to start VoiceMeeter, returns as soon as the request is made
     /// </summary>
     /// <param name="voiceMeeterType">The <see cref="VoiceMeeterType"/> to run</param>
     /// <permission cref="AllowNotLaunchedAttribute">Can be used even if the <see cref="Status"/> is not <see cref="LoginResponse.Ok"/></permission>
@@ -95,13 +95,15 @@ public interface IVoiceMeeterClient
     /// also able to push configuration changes to VoiceMeeter
     /// </summary>
     /// <param name="refreshDelay">The refresh delay, if <c>null</c> only pulls once to populate all fields</param>
+    /// <param name="cancellationToken">A token to request cancellation</param>
     /// <exception cref="DllNotFoundException">In case the VoiceMeeterRemote.dll / VoiceMeeterRemote64.dll files are not found</exception>
     /// <exception cref="VoiceMeeterNotLoggedException">In case the <see cref="Status"/> is not <see cref="LoginResponse.Ok"/></exception>
-    /// <exception cref="ArgumentOutOfRangeException">If the <see cref="paramName"/> is unknown by VoiceMeeter</exception>
+    /// <exception cref="OperationCancelledException">If the <paramref name="cancellationToken"/> requested cancellation</exception>
     /// <returns>A <see cref="VoiceMeeterConfiguration"/> object</returns>
     /// <remarks>The <see cref="VoiceMeeterConfiguration"/> might not have immediately populated fields by the time it's returned</remarks>
-    VoiceMeeterConfiguration GetConfiguration(TimeSpan? refreshDelay = null);
-    
+    /// <returns>A <see cref="Task"/> to follow execution</returns>
+    Task<VoiceMeeterConfiguration> GetConfigurationAsync(TimeSpan? refreshDelay = null, CancellationToken cancellationToken = default);
+
     /// <summary>
     /// Reads the number of output devices VoiceMeeter detected
     /// </summary>
@@ -120,4 +122,17 @@ public interface IVoiceMeeterClient
     /// <returns>The details about an output device</returns>
     /// <remarks>The <see cref="VoiceMeeterDevice.HardwareId"/> property, seems be empty on all non ASIO devices</remarks>
     VoiceMeeterDevice GetOutputDevice(long index);
+
+    /// <summary>
+    /// Same as <see cref="RunVoiceMeeter"/> but waits for VoiceMeeter to finish starting up.
+    /// </summary>
+    /// <param name="voiceMeeterType">The <see cref="VoiceMeeterType"/> to run</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/> to cancel waiting on the application startup</param>
+    /// <returns>A <see cref="Task"/> to wait on VoiceMeeter startup</returns>
+    /// <permission cref="AllowNotLaunchedAttribute">Can be used even if the <see cref="Status"/> is not <see cref="LoginResponse.Ok"/></permission>
+    /// <exception cref="DllNotFoundException">In case the VoiceMeeterRemote.dll / VoiceMeeterRemote64.dll files are not found</exception>
+    /// <exception cref="VoiceMeeterException">If VoiceMeeter is not installed</exception>
+    /// <exception cref="ArgumentOutOfRangeException">If an unknown <see cref="VoiceMeeterType"/> is used</exception>
+    /// <exception cref="OperationCancelledException">If the <paramref name="cancellationToken"/> was cancelled</exception>
+    Task RunAndWaitForVoiceMeeterAsync(VoiceMeeterType voiceMeeterType, CancellationToken cancellationToken = default);
 }
