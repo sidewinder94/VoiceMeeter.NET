@@ -9,5 +9,7 @@ public enum VoiceMeeterType
     VoiceMeeter = 1,
     VoiceMeeterBanana = 2,
     VoiceMeeterPotato = 3,
+    VoiceMeeter64 = 4,
+    VoiceMeeterBanana64 = 5,
     VoiceMeeterPotato64 = 6
 }

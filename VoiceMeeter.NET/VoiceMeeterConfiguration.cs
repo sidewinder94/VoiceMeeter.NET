@@ -54,18 +54,21 @@ public class VoiceMeeterConfiguration : IDisposable
 
         switch (this._voiceMeeterType)
         {
+            case VoiceMeeterType.VoiceMeeter64:
             case VoiceMeeterType.VoiceMeeter:
                 stripCount = 3;
                 virtualStripCount = 1;
                 busCount = 2;
                 virtualBusCount = 1;
                 break;
+            case VoiceMeeterType.VoiceMeeterBanana64:
             case VoiceMeeterType.VoiceMeeterBanana:
                 stripCount = 5;
                 virtualStripCount = 2;
                 busCount = 5;
                 virtualBusCount = 2;
                 break;
+            case VoiceMeeterType.VoiceMeeterPotato64:
             case VoiceMeeterType.VoiceMeeterPotato:
                 stripCount = 8;
                 virtualStripCount = 3;

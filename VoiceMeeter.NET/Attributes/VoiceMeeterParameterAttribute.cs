@@ -18,10 +18,7 @@ public class VoiceMeeterParameterAttribute : Attribute
         this.ParamType = paramType;
         this.StoreName = storeName;
         this.UsableOn = usableOn.IsEmpty()
-            ? new[]
-            {
-                VoiceMeeterType.VoiceMeeter, VoiceMeeterType.VoiceMeeterBanana, VoiceMeeterType.VoiceMeeterPotato
-            }
+            ? Enum.GetValues<VoiceMeeterType>()
             : usableOn;
     }
 }
