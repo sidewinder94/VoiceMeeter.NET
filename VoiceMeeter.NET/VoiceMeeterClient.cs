@@ -119,7 +119,7 @@ public class VoiceMeeterClient : IVoiceMeeterClient, IDisposable
     {
         NativeMethods.GetVoiceMeeterType(out long result);
 
-        if (Environment.Is64BitOperatingSystem)
+        if (Environment.Is64BitOperatingSystem && result != 0)
         {
             result += 3;
         }
